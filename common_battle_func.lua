@@ -75,13 +75,12 @@ function Common_Battle_Activate_ForCommonNPC(ai, goal, probabilities, acts, actA
         actionReturnValue = actionFuncs[forcedActionIndex]()
         ai:DbgSetLastActIdx(forcedActionIndex)
     else
-        local randomPick = ai:GetRandam_Int(1, totalWeight)
+        local random = ai:GetRandam_Int(1, totalWeight)
         local cumulativeWeight = 0
-
         for i = 1, actMax do
             if actionWeights[i] ~= nil then
                 cumulativeWeight = cumulativeWeight + actionWeights[i]
-                if randomPick <= cumulativeWeight then
+                if random <= cumulativeWeight then
                     actionReturnValue = actionFuncs[i]()
                     ai:DbgSetLastActIdx(i)
                     break
