@@ -47,7 +47,7 @@ function Common_Battle_Activate(ai, goal, probabilities, acts, actAfter)
     end
 end
 
-function errorAct(ai, goal, f3_arg2)
+function errorAct(ai, goal, paramTbl)
     goal:AddSubGoal(GOAL_COMMON_ErrorNotification, 5, 0)
     GetWellSpace_Odds = 0
     return GetWellSpace_Odds

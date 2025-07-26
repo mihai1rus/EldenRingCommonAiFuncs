@@ -1,4 +1,4 @@
-function RideRequest(ai, mountType, maxDistance)
+function RideRequest(ai, maxMountDist, minEnemyDist)
     if ai:IsRiding(TARGET_SELF) == true then
         return false
     end
@@ -6,7 +6,7 @@ function RideRequest(ai, mountType, maxDistance)
         return false
     end
     local hasTarget = ai:IsSearchTarget(TARGET_ENE_0)
-    if maxDistance > 0 and hasTarget == true and ai:GetDist(TARGET_ENE_0) <= maxDistance then
+    if minEnemyDist > 0 and hasTarget == true and ai:GetDist(TARGET_ENE_0) <= minEnemyDist then
         return false
     end
     if ai:HasSpecialEffectId(TARGET_SELF, PLAN_SP_EFFECT_HORSE_RIDE) == true then
@@ -20,7 +20,7 @@ function RideRequest(ai, mountType, maxDistance)
     else
         return false
     end
-    if ai:ReserveRide(mountType) == true then
+    if ai:ReserveRide(maxMountDist) == true then
         return true
     end
     return false
@@ -1021,28 +1021,28 @@ function SpaceCheck(ai, radius, direction, distance)
     end
 end
 
-function InsideRange(ai, f68_arg1, f68_arg2, f68_arg3, f68_arg4, f68_arg5)
-    return YSD_InsideRangeEx(ai, f68_arg1, f68_arg2, f68_arg3, f68_arg4, f68_arg5)
+function InsideRange(ai, goal, angleStart, angleWidth, minDist, maxDist)
+    return YSD_InsideRangeEx(ai, goal, angleStart, angleWidth, minDist, maxDist)
     
 end
 
-function InsideDir(ai, f69_arg1, f69_arg2, f69_arg3)
-    return YSD_InsideRangeEx(ai, f69_arg1, f69_arg2, f69_arg3, -999, 999)
+function InsideDir(ai, goal, angleStart, angleWidth)
+    return YSD_InsideRangeEx(ai, goal, angleStart, angleWidth, -999, 999)
     
 end
 
-function YSD_InsideRangeEx(ai, f70_arg1, f70_arg2, f70_arg3, f70_arg4, f70_arg5)
+function YSD_InsideRangeEx(ai, goal, angleStart, angleWidth, minDist, maxDist)
     local distance = ai:GetDist(TARGET_ENE_0)
-    if f70_arg4 <= distance and distance <= f70_arg5 then
-        local f70_local1 = ai:GetToTargetAngle(TARGET_ENE_0)
-        local f70_local2 = 0
-        if f70_arg2 < 0 then
-            f70_local2 = -1
+    if minDist <= distance and distance <= maxDist then
+        local angleToTarget = ai:GetToTargetAngle(TARGET_ENE_0)
+        local angleSign = 0
+        if angleStart < 0 then
+            angleSign = -1
         else
-            f70_local2 = 1
+            angleSign = 1
         end
-        if (f70_arg2 + f70_arg3 / -2 <= f70_local1 and f70_local1 <= f70_arg2 + f70_arg3 / 2) or
-           (f70_arg2 + f70_arg3 / -2 <= f70_local1 + 360 * f70_local2 and f70_local1 + 360 * f70_local2 <= f70_arg2 + f70_arg3 / 2) then
+        if (angleStart + angleWidth / -2 <= angleToTarget and angleToTarget <= angleStart + angleWidth / 2) or
+           (angleStart + angleWidth / -2 <= angleToTarget + 360 * angleSign and angleToTarget + 360 * angleSign <= angleStart + angleWidth / 2) then
             return true
         else
             return false
@@ -1053,14 +1053,14 @@ function YSD_InsideRangeEx(ai, f70_arg1, f70_arg2, f70_arg3, f70_arg4, f70_arg5)
     
 end
 
-function SetCoolTime(actor, goals, animationIds, cooldowns, Weight, WeightReplan)
-    cooldowns = actor:RegistAttackTimeInterval(animationIds, cooldowns)
-    if Weight <= 0 then
+function SetCoolTime(actor, goals, animationIds, coolDowns, weight, weightReplan)
+    coolDowns = actor:RegistAttackTimeInterval(animationIds, coolDowns)
+    if weight <= 0 then
         return 0
-    elseif actor:GetAttackPassedTime(animationIds) <= cooldowns then
-        return WeightReplan
+    elseif actor:GetAttackPassedTime(animationIds) <= coolDowns then
+        return weightReplan
     end
-    return Weight
+    return weight
     
 end
 
@@ -1175,23 +1175,23 @@ function Update_Default_NoSubGoal(self, ai, goal)
     
 end
 
-function GuardGoalSubFunc_Activate(ai, goal, f77_arg2)
-    if 0 < f77_arg2 then
-        ai:DoEzAction(goal, f77_arg2)
+function GuardGoalSubFunc_Activate(ai, goal, ezState)
+    if 0 < ezState then
+        ai:DoEzAction(goal, ezState)
     end
     
 end
 
-function GuardGoalSubFunc_Update(ai, goal, dT, f78_arg3, f78_arg4)
-    if 0 < dT then
+function GuardGoalSubFunc_Update(ai, goal, ezState, successResult, successResultOnLifeEnd)
+    if 0 < ezState then
         if goal:GetNumber(0) ~= 0 then
             return GOAL_RESULT_Failed
         elseif goal:GetNumber(1) ~= 0 then
-            return f78_arg3
+            return successResult
         end
     end
     if goal:GetLife() <= 0 then
-        if f78_arg4 then
+        if successResultOnLifeEnd then
             return GOAL_RESULT_Success
         else
             return GOAL_RESULT_Failed
@@ -1201,8 +1201,8 @@ function GuardGoalSubFunc_Update(ai, goal, dT, f78_arg3, f78_arg4)
     
 end
 
-function GuardGoalSubFunc_Interrupt(ai, goal, interruptType, successResult)
-    if 0 < interruptType then
+function GuardGoalSubFunc_Interrupt(ai, goal, ezState, successResult)
+    if 0 < ezState then
         if ai:IsInterupt(INTERUPT_Damaged) then
             goal:SetNumber(0, 1)
         elseif ai:IsInterupt(INTERUPT_SuccessGuard) and successResult ~= GOAL_RESULT_Continue then
@@ -1300,30 +1300,30 @@ function SetupAttack(ai, goal, params)
     return params.GetWellSpacedOdds or 0
 end
 
-function SetCoolTimeMultiple(actor, goals, animationIds, cooldowns, Weight, WeightReplan)
+function SetCoolTimeMultiple(actor, goals, animationIds, cooldowns, weight, weightReplan)
     local animIds = type(animationIds) == "table" and animationIds or {animationIds}
     local cdList = type(cooldowns) == "table" and cooldowns or {cooldowns}    
-    if Weight <= 0 then
+    if weight <= 0 then
         return 0
     end
     for i, animId in ipairs(animIds) do
         local cooldown = cdList[i] or cdList[1]
         actor:RegistAttackTimeInterval(animId, cooldown)        
         if actor:GetAttackPassedTime(animId) <= cooldown then
-            return WeightReplan
+            return weightReplan
         end
     end   
-    return Weight
+    return weight
 end
 
 function ApplyCooldowns(ai, goal, probabilities, cooldowns)
     for act, cdData in pairs(cooldowns) do
-        local animationIds, cds, WeightReplan = cdData[1], cdData[2], cdData[3]
-        local Weight = probabilities[act]
+        local animationIds, cds, weightReplan = cdData[1], cdData[2], cdData[3]
+        local weight = probabilities[act]
         if type(animationIds) == "table" then
-            probabilities[act] = SetCoolTimeMultiple(ai, goal, animationIds, cds, Weight, WeightReplan)
+            probabilities[act] = SetCoolTimeMultiple(ai, goal, animationIds, cds, weight, weightReplan)
         else
-            probabilities[act] = SetCoolTime(ai, goal, animationIds, cds, Weight, WeightReplan)
+            probabilities[act] = SetCoolTime(ai, goal, animationIds, cds, weight, weightReplan)
         end
     end
 end
