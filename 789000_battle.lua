@@ -261,7 +261,7 @@ Goal.Activate = function (self, ai, goal)
         [22] = {3013, 15, 1}
     }
     ApplyCooldowns(ai, goal, probabilities, coolDowns)
-    RegisterEnemyActs(ai, goal, "MirrorAberration789000", 23, probabilities, paramTbls, acts)
+    RegisterEnemyActs(ai, goal, "MirrorAberration789000", 22, probabilities, paramTbls, acts)
     
 end
 
