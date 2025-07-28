@@ -261,7 +261,7 @@ Goal.Activate = function (self, ai, goal)
         [22] = {3013, 15, 1}
     }
     ApplyCooldowns(ai, goal, probabilities, coolDowns)
-    RegisterEnemyActs(ai, goal, "MirrorAberration789000", 22, probabilities, paramTbls, acts)
+    RegisterEnemyActs(ai, goal, "MirrorAberration789000", 23, probabilities, paramTbls, acts)
     
 end
 
@@ -461,6 +461,8 @@ Goal.Terminate = function (self, ai, goal)
 end
 
 Goal.Interrupt = function (self, ai, goal)
+    local test = ai:HasSpecialEffectId(TARGET_ENE_0, 140)
+    ScriptReload(ai, goal, test, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\ELDEN RING\\Game\\TheGardenOfEyesDLC\\script\\789000_battle-luabnd-dcx\\789000_battle.lua")
     local distance = ai:GetDist(TARGET_ENE_0)
     local successDistance = 5 - ai:GetMapHitRadius(TARGET_SELF)
     local turnTime = 0
