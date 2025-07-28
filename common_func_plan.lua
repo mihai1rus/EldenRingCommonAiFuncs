@@ -1,3 +1,7 @@
+--*******************************************************************************************--
+-- Huge thanks to ElaDiDu for checking these out and making sure I didn't put out bad code :P 
+--*******************************************************************************************--
+
 function RideRequest(ai, maxMountDist, minEnemyDist)
     if ai:IsRiding(TARGET_SELF) == true then
         return false
@@ -1262,6 +1266,7 @@ function ActLotOriginal(probabilities, act, WeightConditionsTrue, WeightConditio
     
 end
 
+-- Simple function that allows you to assign two different weights based on up to 10 conditions. Condition inputs can be nil.
 function ActLot(probabilities, act, WeightConditionsTrue, WeightConditionsFalse,
     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)
     local allConditionsMet = not (c1 == false or c2 == false or c3 == false
@@ -1271,6 +1276,7 @@ function ActLot(probabilities, act, WeightConditionsTrue, WeightConditionsFalse,
     probabilities[act] = allConditionsMet and WeightConditionsTrue or WeightConditionsFalse
 end
 
+-- Allows you to remove the observe for SpEffects in a range.
 function DeleteObservedSpEffectRange(ai, baseId, startId, endId, target)
     target = target or TARGET_SELF
     for i = startId, endId do
@@ -1278,6 +1284,7 @@ function DeleteObservedSpEffectRange(ai, baseId, startId, endId, target)
     end
 end
 
+-- Allows you to add the observe for SpEffects in a range.
 function AddObservedSpEffectRange(ai, baseId, startId, endId, target)
     target = target or TARGET_SELF
     for i = startId, endId do
@@ -1288,24 +1295,25 @@ end
 -- [[
 --    params:
 --    {
---        dist
---        stopDistMin
---        stopDistMax
---        runChance
---        observeEffect
---        observeEffectRange
---        startId
---        endId
---        observeTarget
---        comboRep
---        animId
---        target
---        succesDist
---        turnTime
---        turnAngle
---        GetWellSpacedOdds
+--        dist (mandatory)
+--        stopDistMin (default: dist)
+--        stopDistMax (default: dist + 25)
+--        runChance (default: 100)
+--        observeEffect (default: nil)
+--        observeEffectRange (default: nil)
+--        startId (default: 0)
+--        endId (default: 0)
+--        observeTarget (default: TARGET_SELF)
+--        comboRep (default: GOAL_COMMON_ComboTunable_SuccessAngle180)
+--        animId (mandatory)
+--        target (default: TARGET_ENE_0)
+--        successDist (default: 999)
+--        turnTime (default: 0)
+--        turnAngle (default: 0)
+--        GetWellSpacedOdds (default: 0)
 --    }
 -- ]]
+-- Meant to act as a template for acts. This comes with an Approach_Act_Flex call to make the ai approach their target. By default it is set to sprint.
 function SetupApproach(ai, goal, params)
     local stopDist = params.dist - ai:GetMapHitRadius(TARGET_SELF)
     Approach_Act_Flex(ai, goal, stopDist, params.stopDistMin or stopDist, params.stopDistMax or (stopDist + 25), params.runChance or 100, 0, 3, 3)
@@ -1328,20 +1336,21 @@ end
 -- [[
 --    params:
 --    {
---        observeEffect
---        observeEffectRange
---        startId
---        endId
---        observeTarget
---        comboRep
---        animId
---        target
---        successDist
---        turnTime
---        turnAngle
---        GetWellSpacedOdds
+--        observeEffect (default: nil)
+--        observeEffectRange (default: nil)
+--        startId (default: 0)
+--        endId (default: 0)
+--        observeTarget (default: TARGET_SELF)
+--        comboRep (default: GOAL_COMMON_ComboTunable_SuccessAngle180)
+--        animId (mandatory)
+--        target (default: TARGET_ENE_0)
+--        successDist (default: 999)
+--        turnTime (default: 0)
+--        turnAngle (default: 0)
+--        GetWellSpacedOdds (default: 0)
 --    }
 -- ]]
+-- Meant to act as a template for acts. 
 function SetupAttack(ai, goal, params)
     local observeEffect = params.observeEffect or nil
     local observeEffectRange = params.observeEffectRange or nil
@@ -1359,6 +1368,7 @@ function SetupAttack(ai, goal, params)
     return params.GetWellSpacedOdds or 0
 end
 
+-- Allows the user to set a cooldown for an act relative to multiple animations at once. 
 function SetCoolTimeMultiple(actor, goals, animationIds, cooldowns, weight, weightReplan)
     local animIds = type(animationIds) == "table" and animationIds or {animationIds}
     local cdList = type(cooldowns) == "table" and cooldowns or {cooldowns}    
@@ -1375,6 +1385,7 @@ function SetCoolTimeMultiple(actor, goals, animationIds, cooldowns, weight, weig
     return weight
 end
 
+-- Processes cooldowns in order to simplify the process of setting them.
 function ApplyCooldowns(ai, goal, probabilities, cooldowns)
     for act, cdData in pairs(cooldowns) do
         local animationIds, cds, weightReplan = cdData[1], cdData[2], cdData[3]
@@ -1387,6 +1398,7 @@ function ApplyCooldowns(ai, goal, probabilities, cooldowns)
     end
 end
 
+-- Makeshift Common_Battle_Activate function meant only to process and assign weights to acts.
 function SelectSubGoal(ai, goal, probabilities)
     local totalWeight, cumulativeWeight = 0, 0
     local selectedAct = nil
@@ -1408,6 +1420,7 @@ function SelectSubGoal(ai, goal, probabilities)
     return selectedAct
 end
 
+-- Simple function meant to shorten the process of registering acts. Remember that your act names must start from Act1, not Act01 for this to work. 
 function RegisterEnemyActs(ai, goal, baseName, actCount, probabilities, paramTbls, acts)
     for i = 1, actCount do
         local actName = baseName.."_Act"..i
@@ -1419,6 +1432,7 @@ function RegisterEnemyActs(ai, goal, baseName, actCount, probabilities, paramTbl
     Common_Battle_Activate(ai, goal, probabilities, acts, actAfter, paramTbls)
 end
 
+-- Equivalent func to one of the templates FromSoft uses for warping. 
 function ControlledWarp(ai, goal, options, target)
     goal:ClearSubGoal()
     local targetRadius = ai:GetMapHitRadius(TARGET_SELF)
