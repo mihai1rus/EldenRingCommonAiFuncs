@@ -1228,53 +1228,53 @@ end
 
 
 -- Original ACVI function EZOP_CActLot
-function ActLotOriginal(probabilities, act, WeightConditionsTrue, WeightConditionsFalse, Condition1, Condition2, Condition3, Condition4, Condition5, Condition6, Condition7, Condition8, Condition9, Condition10)
-    if Condition1 == nil then
-        Condition1 = true
+function ActLotOriginal(probabilities, act, weightConditionsTrue, weightConditionsFalse, conditionOne, conditionTwo, conditionThree, conditionFour, conditionFive, conditionSix, conditionSeven, conditionEight, conditionNine, conditionTen)
+    if conditionOne == nil then
+        conditionOne = true
     end
-    if Condition2 == nil then
-        Condition2 = true
+    if conditionTwo == nil then
+        conditionTwo = true
     end
-    if Condition3 == nil then
-        Condition3 = true
+    if conditionThree == nil then
+        conditionThree = true
     end
-    if Condition4 == nil then
-        Condition4 = true
+    if conditionFour == nil then
+        conditionFour = true
     end
-    if Condition5 == nil then
-        Condition5 = true
+    if conditionFive == nil then
+        conditionFive = true
     end
-    if Condition6 == nil then
-        Condition6 = true
+    if conditionSix == nil then
+        conditionSix = true
     end
-    if Condition7 == nil then
-        Condition7 = true
+    if conditionSeven == nil then
+        conditionSeven = true
     end
-    if Condition8 == nil then
-        Condition8 = true
+    if conditionEight == nil then
+        conditionEight = true
     end
-    if Condition9 == nil then
-        Condition9 = true
+    if conditionNine == nil then
+        conditionNine = true
     end
-    if Condition10 == nil then
-        Condition10 = true
+    if conditionTen == nil then
+        conditionTen = true
     end
-    if Condition1 and Condition2 and Condition3 and Condition4 and Condition5 and Condition6 and Condition7 and Condition8 and Condition9 and Condition10 then
-        probabilities[act] = WeightConditionsTrue
+    if conditionOne and conditionTwo and conditionThree and conditionFour and conditionFive and conditionSix and conditionSeven and conditionEight and conditionNine and conditionTen then
+        probabilities[act] = weightConditionsTrue
     else
-        probabilities[act] = WeightConditionsFalse
+        probabilities[act] = weightConditionsFalse
     end
     
 end
 
 -- Simple function that allows you to assign two different weights based on up to 10 conditions. Condition inputs can be nil.
-function ActLot(probabilities, act, WeightConditionsTrue, WeightConditionsFalse,
+function ActLot(probabilities, act, weightConditionsTrue, weightConditionsFalse,
     c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)
     local allConditionsMet = not (c1 == false or c2 == false or c3 == false
                 or c4 == false or c5 == false or c6 == false
                 or c7 == false or c8 == false or c9 == false
                 or c10 == false)
-    probabilities[act] = allConditionsMet and WeightConditionsTrue or WeightConditionsFalse
+    probabilities[act] = allConditionsMet and weightConditionsTrue or weightConditionsFalse
 end
 
 -- Allows you to remove the observe for SpEffects in a range.
