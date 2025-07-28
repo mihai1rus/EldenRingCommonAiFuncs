@@ -1274,12 +1274,38 @@ function AddObservedSpEffectRange(ai, baseId, startId, endId, target)
     end
 end
 
+-- [[
+--    params:
+--    {
+--        dist
+--        stopDistMin
+--        stopDistMax
+--        runChance
+--        observeEffect
+--        observeEffectRange
+--        startId
+--        endId
+--        observeTarget
+--        comboRep
+--        animId
+--        target
+--        succesDist
+--        turnTime
+--        turnAngle
+--        GetWellSpacedOdds
+--    }
+-- ]]
 function SetupApproach(ai, goal, params)
     local stopDist = params.dist - ai:GetMapHitRadius(TARGET_SELF)
     Approach_Act_Flex(ai, goal, stopDist, params.stopDistMin or stopDist, params.stopDistMax or (stopDist + 25), params.runChance or 100, 0, 3, 3)
     local observeEffect = params.observeEffect or nil
-    if observeEffect then
-        ai:AddObserveSpecialEffectAttribute(TARGET_SELF, params.observeEffect)
+    local observeEffectRange = params.observeEffectRange or nil
+    local startId = params.startId or 0
+    local endId = params.endId or 0
+    if observeEffectRange then
+        AddObservedSpEffectRange(ai, observeEffectRange, startId, endId, params.observeTarget or TARGET_SELF)
+    elseif observeEffect then
+        ai:AddObserveSpecialEffectAttribute(params.observeTarget or TARGET_SELF, observeEffect)
     end
     goal:AddSubGoal(params.comboRep and GOAL_COMMON_ComboRepeat_SuccessAngle180 or 
                    GOAL_COMMON_ComboTunable_SuccessAngle180, 
@@ -1288,10 +1314,32 @@ function SetupApproach(ai, goal, params)
     return params.GetWellSpacedOdds or 0
 end
 
+-- [[
+--    params:
+--    {
+--        observeEffect
+--        observeEffectRange
+--        startId
+--        endId
+--        observeTarget
+--        comboRep
+--        animId
+--        target
+--        successDist
+--        turnTime
+--        turnAngle
+--        GetWellSpacedOdds
+--    }
+-- ]]
 function SetupAttack(ai, goal, params)
     local observeEffect = params.observeEffect or nil
-    if observeEffect then
-        ai:AddObserveSpecialEffectAttribute(TARGET_SELF, params.observeEffect)
+    local observeEffectRange = params.observeEffectRange or nil
+    local startId = params.startId or 0
+    local endId = params.endId or 0
+    if observeEffectRange then
+        AddObservedSpEffectRange(ai, observeEffectRange, startId, endId, params.observeTarget or TARGET_SELF)
+    elseif observeEffect then
+        ai:AddObserveSpecialEffectAttribute(params.observeTarget or TARGET_SELF, observeEffect)
     end
     goal:AddSubGoal(params.comboRep and GOAL_COMMON_ComboRepeat_SuccessAngle180 or 
                    GOAL_COMMON_ComboTunable_SuccessAngle180, 
@@ -1352,7 +1400,9 @@ end
 function RegisterEnemyActs(ai, goal, baseName, actCount, probabilities, paramTbls, acts)
     for i = 1, actCount do
         local actName = baseName.."_Act"..i
-        acts[i] = REGIST_FUNC(ai, goal, _G[actName])
+        if _G[actName] then
+            acts[i] = REGIST_FUNC(ai, goal, _G[actName])
+        end
     end
     local actAfter = REGIST_FUNC(ai, goal, baseName.."_ActAfter_AdjustSpace")
     Common_Battle_Activate(ai, goal, probabilities, acts, actAfter, paramTbls)
