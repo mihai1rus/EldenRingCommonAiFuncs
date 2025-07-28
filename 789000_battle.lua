@@ -278,7 +278,7 @@ end
 function MirrorAberration789000_Act2(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 12,
-        animId = 3014,
+        animId = 3014
     })
 end
 
@@ -295,7 +295,7 @@ end
 function MirrorAberration789000_Act4(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 12,
-        animId = 3019,
+        animId = 3019
     })   
 end
 
@@ -321,7 +321,7 @@ end
 function MirrorAberration789000_Act7(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 7,
-        animId = 3028,
+        animId = 3028
     })
 end
 
@@ -329,7 +329,7 @@ end
 function MirrorAberration789000_Act8(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 8.5,
-        animId = 3029,
+        animId = 3029
     })
 end
 
@@ -337,7 +337,7 @@ end
 function MirrorAberration789000_Act9(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 7,
-        animId = 3030,
+        animId = 3030
     })  
 end
 
@@ -345,7 +345,7 @@ end
 function MirrorAberration789000_Act10(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 10,
-        animId = 3031,
+        animId = 3031
     })  
 end
 
@@ -353,7 +353,7 @@ end
 function MirrorAberration789000_Act11(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 6,
-        animId = 3032,
+        animId = 3032
     })  
 end
 
@@ -361,7 +361,7 @@ end
 function MirrorAberration789000_Act12(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 8,
-        animId = 3033,
+        animId = 3033
     })
 end
 
@@ -419,21 +419,21 @@ end
 -- Shoot Cannon Forward Bubble 1
 function MirrorAberration789000_Act19(ai, goal, paramTbl)
     return SetupAttack(ai, goal, {
-        animId = 3017,
+        animId = 3017
     }) 
 end
 
 -- Shoot Cannon Upwards Bubble 2
 function MirrorAberration789000_Act20(ai, goal, paramTbl)
     return SetupAttack(ai, goal, {
-        animId = 3016,
+        animId = 3016
     }) 
 end
 
 -- Shoot Cannon Powerful Bubble 3
 function MirrorAberration789000_Act21(ai, goal, paramTbl)
     return SetupAttack(ai, goal, {
-        animId = 3034,
+        animId = 3034
     }) 
 end
 
@@ -441,7 +441,7 @@ end
 function MirrorAberration789000_Act22(ai, goal, paramTbl)
     return SetupApproach(ai, goal, {
         dist = 10,
-        animId = 3013,
+        animId = 3013
     }) 
 end
 
