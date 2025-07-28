@@ -1358,3 +1358,13 @@ function ControlledWarp(ai, goal, options, target)
     goal:AddSubGoal(GOAL_COMMON_ToTargetWarp, 10, target, selectedDir, selectedDist, TARGET_ENE_0)
     return true
 end
+
+-- Executes an AI script on certain actions. Essentially for Hot-Reloading AI.
+function ScriptReload(ai, goal, condition, filePath)
+    if condition then
+        local script = loadfile(filePath)
+        if script then
+            script()
+        end
+    end
+end
