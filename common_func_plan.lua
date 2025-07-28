@@ -1212,6 +1212,17 @@ function GuardGoalSubFunc_Interrupt(ai, goal, ezState, successResult)
     return false
 end
 
+
+
+--                      Some new common funcs                               
+--*************************************************************************--
+-- Check the included 789000_battle.lua to see usage of most of these funcs
+--*************************************************************************--
+
+
+
+
+-- Original ACVI function EZOP_CActLot
 function ActLotOriginal(probabilities, act, WeightConditionsTrue, WeightConditionsFalse, Condition1, Condition2, Condition3, Condition4, Condition5, Condition6, Condition7, Condition8, Condition9, Condition10)
     if Condition1 == nil then
         Condition1 = true
