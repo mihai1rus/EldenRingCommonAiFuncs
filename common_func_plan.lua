@@ -96,12 +96,8 @@ function CommonNPC_SwitchOneHandMode(ai, goal)
 end
 
 function NPC_Approach_Act_Flex(ai, goal, stopDistance, runChanceDistance, forceRunDistance, runChance, guardChance, walkLife, runLife)
-    if walkLife == nil then
-        walkLife = 3
-    end
-    if runLife == nil then
-        runLife = 8
-    end
+    walkLife = walkLife or 3
+    runLife = runLife or 8
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local random = ai:GetRandam_Int(1, 100)
     local shouldWalk = true
@@ -195,10 +191,10 @@ function FindAttack_Step(ai, goal, reactionDistance, reactionChance, stepBackCha
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
-    local backChance = GET_PARAM_IF_NIL_DEF(stepBackChance, 50)
-    local leftChance = GET_PARAM_IF_NIL_DEF(stepLeftChance, 25)
-    local rightChance = GET_PARAM_IF_NIL_DEF(stepRightChance, 25)
-    local minSafeDistance = GET_PARAM_IF_NIL_DEF(safetyDistance, 3)
+    local backChance = stepBackChance or 50
+    local leftChance = stepLeftChance or 25
+    local rightChance = stepRightChance or 25
+    local minSafeDistance = safetyDistance or 3
     if ai:IsInterupt(INTERUPT_FindAttack) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         if stepDirectionRoll <= backChance then
@@ -216,9 +212,9 @@ function FindAttack_Guard(ai, goal, reactionDistance, reactionChance, retreatCha
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local retreatTypeRoll = ai:GetRandam_Int(1, 100)
-    local retreatProbability = GET_PARAM_IF_NIL_DEF(retreatChance, 40)
-    local life = GET_PARAM_IF_NIL_DEF(retreatDuration, 4)
-    local safeDistance = GET_PARAM_IF_NIL_DEF(retreatDistance, 3)
+    local retreatProbability = retreatChance or 40
+    local life = retreatDuration or 4
+    local safeDistance = retreatDistance or 3
     if ai:IsInterupt(INTERUPT_FindAttack) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         if retreatTypeRoll <= retreatProbability then
@@ -236,13 +232,13 @@ function FindAttack_Step_or_Guard(ai, goal, reactionDistance, reactionChance, st
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local actionTypeRoll = ai:GetRandam_Int(1, 100)
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
-    local backChance = GET_PARAM_IF_NIL_DEF(stepBackChance, 50)
-    local leftChance = GET_PARAM_IF_NIL_DEF(stepLeftChance, 25)
-    local rightChance = GET_PARAM_IF_NIL_DEF(stepRightChance, 25)
-    local minSafeDistance = GET_PARAM_IF_NIL_DEF(safetyDistance, 3)
-    local retreatProbability = GET_PARAM_IF_NIL_DEF(retreatChance, 40)
-    local life = GET_PARAM_IF_NIL_DEF(retreatDuration, 4)
-    local safeDistance = GET_PARAM_IF_NIL_DEF(retreatDistance, 3)
+    local backChance = stepBackChance or 50
+    local leftChance = stepLeftChance or 25
+    local rightChance = stepRightChance or 25
+    local minSafeDistance = safetyDistance or 3
+    local retreatProbability = retreatChance or 40
+    local life = retreatDuration or 4
+    local safeDistance = retreatDistance or 3
     if ai:IsInterupt(INTERUPT_FindAttack) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         if actionTypeRoll <= stepChance then
             goal:ClearSubGoal()
@@ -281,9 +277,9 @@ function Damaged_Guard(ai, goal, reactionDistance, reactionChance, retreatChance
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local retreatTypeRoll = ai:GetRandam_Int(1, 100)
-    local retreatProbability = GET_PARAM_IF_NIL_DEF(retreatChance, 40)
-    local life = GET_PARAM_IF_NIL_DEF(retreatDuration, 4)
-    local safeDistance = GET_PARAM_IF_NIL_DEF(retreatDistance, 3)
+    local retreatProbability = retreatChance or 40
+    local life = retreatDuration or 4
+    local safeDistance = retreatDistance or 3
     if ai:IsInterupt(INTERUPT_Damaged) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         if retreatTypeRoll <= retreatProbability then
@@ -300,10 +296,10 @@ function Damaged_Step(ai, goal, reactionDistance, reactionChance, stepBackChance
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
-    local backChance = GET_PARAM_IF_NIL_DEF(stepBackChance, 50)
-    local leftChance = GET_PARAM_IF_NIL_DEF(stepLeftChance, 25)
-    local rightChance = GET_PARAM_IF_NIL_DEF(stepRightChance, 25)
-    local minSafeDistance = GET_PARAM_IF_NIL_DEF(safetyDistance, 3)
+    local backChance = stepBackChance or 50
+    local leftChance = stepLeftChance or 25
+    local rightChance = stepRightChance or 25
+    local minSafeDistance = safetyDistance or 3
     if ai:IsInterupt(INTERUPT_Damaged) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         if stepDirectionRoll <= backChance then
@@ -322,13 +318,13 @@ function Damaged_Step_or_Guard(ai, goal, reactionDistance, reactionChance, stepC
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local actionTypeRoll = ai:GetRandam_Int(1, 100)
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
-    local backChance = GET_PARAM_IF_NIL_DEF(stepBackChance, 50)
-    local leftChance = GET_PARAM_IF_NIL_DEF(stepLeftChance, 25)
-    local rightChance = GET_PARAM_IF_NIL_DEF(stepRightChance, 25)
-    local minSafeDistance = GET_PARAM_IF_NIL_DEF(safetyDistance, 3)
-    local retreatProbability = GET_PARAM_IF_NIL_DEF(retreatChance, 40)
-    local life = GET_PARAM_IF_NIL_DEF(retreatDuration, 4)
-    local safeDistance = GET_PARAM_IF_NIL_DEF(retreatDistance, 3)
+    local backChance = stepBackChance or 50
+    local leftChance = stepLeftChance or 25
+    local rightChance = stepRightChance or 25
+    local minSafeDistance = safetyDistance or 3
+    local retreatProbability = retreatChance or 40
+    local life = retreatDuration or 4
+    local safeDistance = retreatDistance or 3
     if ai:IsInterupt(INTERUPT_Damaged) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         if actionTypeRoll <= stepChance then
             goal:ClearSubGoal()
@@ -408,10 +404,10 @@ end
 function Shoot_1kind(ai, goal, reactionDistance, reactionChance)
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local reactionRoll = ai:GetRandam_Int(1, 100)
-    local stepBackChance = GET_PARAM_IF_NIL_DEF(bkStepPer, 50)
-    local stepLeftChance = GET_PARAM_IF_NIL_DEF(leftStepPer, 25)
-    local stepRightChance = GET_PARAM_IF_NIL_DEF(rightStepPer, 25)
-    local minSafeDistance = GET_PARAM_IF_NIL_DEF(safetyDist, 3)
+    local stepBackChance = bkStepPer or 50
+    local stepLeftChance = leftStepPer or 25
+    local stepRightChance = rightStepPer or 25
+    local minSafeDistance = safetyDist or 3
     if ai:IsInterupt(INTERUPT_Shoot) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         return true
@@ -443,10 +439,10 @@ end
 function MissSwingSelf_Step(ai, goal, reactionChance, stepBackChance, stepLeftChance, stepRightChance, safetyDistance)
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
-    local backChance = GET_PARAM_IF_NIL_DEF(stepBackChance, 50)
-    local leftChance = GET_PARAM_IF_NIL_DEF(stepLeftChance, 25)
-    local rightChance = GET_PARAM_IF_NIL_DEF(stepRightChance, 25)
-    local minSafeDistance = GET_PARAM_IF_NIL_DEF(safetyDistance, 3)
+    local backChance = stepBackChance or 50
+    local leftChance = stepLeftChance or 25
+    local rightChance = stepRightChance or 25
+    local minSafeDistance = safetyDistance or 3
     if ai:IsInterupt(INTERUPT_MissSwingSelf) and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         if stepDirectionRoll <= backChance then
@@ -463,10 +459,10 @@ end
 function RebByOpGuard_Step(ai, goal, reactionChance, stepBackChance, stepLeftChance, stepRightChance, safetyDistance)
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
-    local backChance = GET_PARAM_IF_NIL_DEF(stepBackChance, 50)
-    local leftChance = GET_PARAM_IF_NIL_DEF(stepLeftChance, 25)
-    local rightChance = GET_PARAM_IF_NIL_DEF(stepRightChance, 25)
-    local minSafeDistance = GET_PARAM_IF_NIL_DEF(safetyDistance, 3)
+    local backChance = stepBackChance or 50
+    local leftChance = stepLeftChance or 25
+    local rightChance = stepRightChance or 25
+    local minSafeDistance = safetyDistance or 3
     if ai:IsInterupt(INTERUPT_ReboundByOpponentGuard) and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         if stepDirectionRoll <= backChance then
@@ -587,8 +583,8 @@ function Approach_and_Attack_Act(ai, goal, stopDistance, runStartDistance, guard
     if guardRoll <= guardChance then
         guardStateId = 9910
     end
-    local turnLife = GET_PARAM_IF_NIL_DEF(turnTime, 1.5)
-    local turnAngleDegrees = GET_PARAM_IF_NIL_DEF(turnAngle, 20)
+    local turnLife = turnTime or 1.5
+    local turnAngleDegrees = turnAngle or 20
     goal:AddSubGoal(GOAL_COMMON_ApproachTarget, 10, TARGET_ENE_0, stopDistance, TARGET_SELF, shouldWalk, guardStateId)
     goal:AddSubGoal(GOAL_COMMON_AttackTunableSpin, 10, attackAnimation, TARGET_ENE_0, successDistance, turnLife, turnAngleDegrees)
 end
@@ -694,9 +690,7 @@ function Shoot_Act(ai, goal, primaryAnimation, secondaryAnimation, comboCount)
 end
 
 function Approach_Act(ai, goal, stopDistance, runStartDistance, guardChance, life)
-    if life == nil then
-        life = 10
-    end
+    life = life or 10
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local shouldWalk = true
     if runStartDistance <= currentDistance then
@@ -985,12 +979,8 @@ function REGIST_FUNC(ai, goal, act, paramTable)
 end
 
 function Approach_Act_Flex(ai, goal, stopDistance, runChanceDistance, forceRunDistance, runChance, guardChance, walkLife, runLife)
-    if walkLife == nil then
-        walkLife = 3
-    end
-    if runLife == nil then
-        runLife = 8
-    end
+    walkLife = walkLife or 3
+    runLife = runLife or 8
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local randomRoll = ai:GetRandam_Int(1, 100)
     local shouldWalk = true
@@ -1071,9 +1061,7 @@ end
 
 function Counter_Act(ai, goal, baseIncrement, counterAnimation)
     local life = 0.5
-    if baseIncrement == nil then
-        baseIncrement = 4
-    end
+    baseIncrement = baseIncrement or 4
     local randomRoll = ai:GetRandam_Int(1, 100)
     local currentIncrement = ai:GetNumber(15)
     if ai:IsInterupt(INTERUPT_Damaged) then
