@@ -1421,7 +1421,7 @@ function SelectSubGoal(ai, goal, probabilities)
     return selectedAct
 end
 
--- Simple function meant to shorten the process of registering acts. Remember that your act names must start from Act1, not Act01 for this to work. 
+-- Simple function meant to shorten the process of registering acts. Remember that your act names must start from Act1, not Act01 for this to work and keep your acts in order.
 function RegisterEnemyActs(ai, goal, baseName, actCount, probabilities, paramTbls, acts)
     for i = 1, actCount do
         local actName = baseName.."_Act"..i
