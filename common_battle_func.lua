@@ -1,3 +1,7 @@
+--********************************************************************************************************************************************************************--
+-- I've increased the maximum number of acts from 50 to 500 and replaced an i = 50 with a break in Common_Battle_Activate but everything else here should be the same. 
+--********************************************************************************************************************************************************************--
+
 function Common_Clear_Param(probabilities, acts)
     for actNum = 1, 500 do
         probabilities[actNum] = 0

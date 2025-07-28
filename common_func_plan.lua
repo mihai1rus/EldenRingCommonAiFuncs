@@ -1,6 +1,7 @@
---*******************************************************************************************--
+--**********************************************************************************************************--
 -- Huge thanks to ElaDiDu for checking these out and making sure I didn't put out bad code :P 
---*******************************************************************************************--
+-- The new funcs are at the end. Check the 789000_battle.lua file included to see how most of them are used.
+--**********************************************************************************************************--
 
 function RideRequest(ai, maxMountDist, minEnemyDist)
     if ai:IsRiding(TARGET_SELF) == true then
