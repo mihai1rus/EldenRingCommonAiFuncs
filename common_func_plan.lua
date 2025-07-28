@@ -36,9 +36,7 @@ function FearOfFire(ai, goal, idleType)
        ai:HasSpecialEffectAttribute(TARGET_SELF, SP_EFFECT_TYPE_ENABLE_BEAST_REPELLENT) and 
        ai:HasSpecialEffectId(TARGET_SELF, PLAN_SP_EFFECT_BEAST_REPELLENT_UNDAMAGED) and 
        ai:GetStringIndexedNumber("DisableFearOfFire") == 0 then
-        if idleType == nil then
-            idleType = PLAN_SIDEWAYTYPE__NONE
-        end
+        idleType = idleType or PLAN_SIDEWAYTYPE__NONE
         if idleType == PLAN_SIDEWAYTYPE__NONE then
             goal:AddSubGoal(GOAL_COMMON_SideWay_For_Fear_Of_Fire, -1, 10, -1, false)
         elseif idleType == PLAN_SIDEWAYTYPE__DEFAULT then
@@ -100,28 +98,18 @@ function NPC_Approach_Act_Flex(ai, goal, stopDistance, runChanceDistance, forceR
     runLife = runLife or 8
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local random = ai:GetRandam_Int(1, 100)
-    local shouldWalk = true
-    if forceRunDistance <= currentDistance then
-        shouldWalk = false
-    elseif runChanceDistance <= currentDistance and random <= runChance then
-        shouldWalk = false
-    end
-    local guardStateId = -1
+    local shouldWalk = not (currentDistance >= forceRunDistance or
+        (currentDistance >= runChanceDistance and random <= runChance))
     local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 4
-    end
-    local approachLife = shouldWalk and walkLife or runLife
-    local distanceAdjustment = 0
+    local guardStateId = guardRoll <= guardChance and 4 or -1
     if stopDistance <= currentDistance then
-        if shouldWalk then
-            stopDistance = stopDistance + ai:GetStringIndexedNumber("AddDistWalk") + distanceAdjustment
-        else
-            stopDistance = stopDistance + ai:GetStringIndexedNumber("AddDistRun") + distanceAdjustment
-        end
+        local approachLife = shouldWalk and walkLife or runLife
+        local distApproach = shouldWalk and "AddDistWalk" or "AddDistRun"
+        stopDistance = stopDistance + ai:GetStringIndexedNumber(distApproach)
         goal:AddSubGoal(GOAL_COMMON_ApproachTarget, approachLife, TARGET_ENE_0, stopDistance, TARGET_SELF, shouldWalk, guardStateId)
     end
 end
+
 
 function NPC_KATATE_Switch(ai, goal)
     if ai:IsBothHandMode(TARGET_SELF) then
@@ -320,7 +308,6 @@ function Damaged_Step_or_Guard(ai, goal, reactionDistance, reactionChance, stepC
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
     local backChance = stepBackChance or 50
     local leftChance = stepLeftChance or 25
-    local rightChance = stepRightChance or 25
     local minSafeDistance = safetyDistance or 3
     local retreatProbability = retreatChance or 40
     local life = retreatDuration or 4
@@ -404,10 +391,6 @@ end
 function Shoot_1kind(ai, goal, reactionDistance, reactionChance)
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     local reactionRoll = ai:GetRandam_Int(1, 100)
-    local stepBackChance = bkStepPer or 50
-    local stepLeftChance = leftStepPer or 25
-    local stepRightChance = rightStepPer or 25
-    local minSafeDistance = safetyDist or 3
     if ai:IsInterupt(INTERUPT_Shoot) and currentDistance <= reactionDistance and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
         return true
@@ -441,7 +424,6 @@ function MissSwingSelf_Step(ai, goal, reactionChance, stepBackChance, stepLeftCh
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
     local backChance = stepBackChance or 50
     local leftChance = stepLeftChance or 25
-    local rightChance = stepRightChance or 25
     local minSafeDistance = safetyDistance or 3
     if ai:IsInterupt(INTERUPT_MissSwingSelf) and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
@@ -461,7 +443,6 @@ function RebByOpGuard_Step(ai, goal, reactionChance, stepBackChance, stepLeftCha
     local stepDirectionRoll = ai:GetRandam_Int(1, 100)
     local backChance = stepBackChance or 50
     local leftChance = stepLeftChance or 25
-    local rightChance = stepRightChance or 25
     local minSafeDistance = safetyDistance or 3
     if ai:IsInterupt(INTERUPT_ReboundByOpponentGuard) and reactionRoll <= reactionChance then
         goal:ClearSubGoal()
@@ -559,11 +540,8 @@ function FindShoot_Act(ai, goal, closeRangeChance, midRangeChance, farRangeChanc
 end
 
 function BusyApproach_Act(ai, goal, stopDistance, runStartDistance, guardChance)
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     if runStartDistance <= currentDistance then
         goal:AddSubGoal(GOAL_COMMON_ApproachTarget, 10, TARGET_ENE_0, stopDistance, TARGET_SELF, false, guardStateId)
@@ -574,15 +552,9 @@ end
 
 function Approach_and_Attack_Act(ai, goal, stopDistance, runStartDistance, guardChance, attackAnimation, successDistance, turnTime, turnAngle)
     local currentDistance = ai:GetDist(TARGET_ENE_0)
-    local shouldWalk = true
-    if runStartDistance <= currentDistance then
-        shouldWalk = false
-    end
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local shouldWalk = not (runStartDistance <= currentDistance)
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     local turnLife = turnTime or 1.5
     local turnAngleDegrees = turnAngle or 20
     goal:AddSubGoal(GOAL_COMMON_ApproachTarget, 10, TARGET_ENE_0, stopDistance, TARGET_SELF, shouldWalk, guardStateId)
@@ -591,41 +563,26 @@ end
 
 function KeepDist_and_Attack_Act(ai, goal, minDistance, maxDistance, runStartDistance, guardChance, attackAnimation, successDistance)
     local currentDistance = ai:GetDist(TARGET_ENE_0)
-    local shouldWalk = true
-    if runStartDistance <= currentDistance then
-        shouldWalk = false
-    end
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local shouldWalk = not (runStartDistance <= currentDistance)
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     goal:AddSubGoal(GOAL_COMMON_KeepDist, 10, TARGET_ENE_0, minDistance, maxDistance, TARGET_ENE_0, shouldWalk, guardStateId)
     goal:AddSubGoal(GOAL_COMMON_Attack, 10, attackAnimation, TARGET_ENE_0, successDistance, 0)
 end
 
 function Approach_and_GuardBreak_Act(ai, goal, stopDistance, runStartDistance, guardChance, guardBreakAnimation, guardBreakDistance, followupAnimation, followupDistance)
     local currentDistance = ai:GetDist(TARGET_ENE_0)
-    local shouldWalk = true
-    if runStartDistance <= currentDistance then
-        shouldWalk = false
-    end
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local shouldWalk = not (runStartDistance <= currentDistance)
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     goal:AddSubGoal(GOAL_COMMON_ApproachTarget, 10, TARGET_ENE_0, stopDistance, TARGET_SELF, shouldWalk, guardStateId)
     goal:AddSubGoal(GOAL_COMMON_GuardBreakAttack, 10, guardBreakAnimation, TARGET_ENE_0, guardBreakDistance, 0)
     goal:AddSubGoal(GOAL_COMMON_ComboFinal, 10, followupAnimation, TARGET_ENE_0, followupDistance, 0)
 end
 
 function GetWellSpace_Act(ai, goal, guardChance, noActionChance, sideStepChance, retreatChance, waitChance, backstepChance)
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     local actionRoll = ai:GetRandam_Int(1, 100)
     local sideStepDir = ai:GetRandam_Int(0, 1)
     local sideStepCount = ai:GetTeamRecordCount(COORDINATE_TYPE_SideWalk_L + sideStepDir, TARGET_ENE_0, 2)
@@ -643,11 +600,8 @@ function GetWellSpace_Act(ai, goal, guardChance, noActionChance, sideStepChance,
 end
 
 function GetWellSpace_Act_IncludeSidestep(ai, goal, guardChance, noActionChance, sideStepChance, retreatChance, waitChance, backstepChance, sideStepBackChance)
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     local actionRoll = ai:GetRandam_Int(1, 100)
     local sideStepDir = ai:GetRandam_Int(0, 1)
     local sideStepCount = ai:GetTeamRecordCount(COORDINATE_TYPE_SideWalk_L + sideStepDir, TARGET_ENE_0, 2)
@@ -674,47 +628,29 @@ end
 function Shoot_Act(ai, goal, primaryAnimation, secondaryAnimation, comboCount)
     if comboCount == 1 then
         goal:AddSubGoal(GOAL_COMMON_Attack, 10, primaryAnimation, TARGET_ENE_0, DIST_None, 0)
-    elseif comboCount >= 2 then
-        goal:AddSubGoal(GOAL_COMMON_ComboAttack, 10, primaryAnimation, TARGET_ENE_0, DIST_None, 0)
-        if comboCount >= 3 then
-            goal:AddSubGoal(GOAL_COMMON_ComboRepeat, 10, secondaryAnimation, TARGET_ENE_0, DIST_None, 0)
-            if comboCount >= 4 then
-                goal:AddSubGoal(GOAL_COMMON_ComboRepeat, 10, secondaryAnimation, TARGET_ENE_0, DIST_None, 0)
-                if comboCount >= 5 then
-                    goal:AddSubGoal(GOAL_COMMON_ComboRepeat, 10, secondaryAnimation, TARGET_ENE_0, DIST_None, 0)
-                end
-            end
-        end
-        goal:AddSubGoal(GOAL_COMMON_ComboFinal, 10, secondaryAnimation, TARGET_ENE_0, DIST_None, 0)
+        return
     end
+    goal:AddSubGoal(GOAL_COMMON_ComboAttack, 10, primaryAnimation, TARGET_ENE_0, DIST_None, 0)
+    for i = 3, math.min(comboCount, 5) do
+        goal:AddSubGoal(GOAL_COMMON_ComboRepeat, 10, secondaryAnimation, TARGET_ENE_0, DIST_None, 0)
+    end
+    goal:AddSubGoal(GOAL_COMMON_ComboFinal, 10, secondaryAnimation, TARGET_ENE_0, DIST_None, 0)
 end
 
+
 function Approach_Act(ai, goal, stopDistance, runStartDistance, guardChance, life)
-    life = life or 10
     local currentDistance = ai:GetDist(TARGET_ENE_0)
-    local shouldWalk = true
-    if runStartDistance <= currentDistance then
-        shouldWalk = false
-    end
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
-    goal:AddSubGoal(GOAL_COMMON_ApproachTarget, life, TARGET_ENE_0, stopDistance, TARGET_SELF, shouldWalk, guardStateId)
+    local shouldWalk = not (runStartDistance <= currentDistance)
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
+    goal:AddSubGoal(GOAL_COMMON_ApproachTarget, life or 10, TARGET_ENE_0, stopDistance, TARGET_SELF, shouldWalk, guardStateId)
 end
 
 function Approach_or_Leave_Act(ai, goal, approachDistance, safeDistance, runStartDistance, guardChance)
     local currentDistance = ai:GetDist(TARGET_ENE_0)
-    local shouldWalk = true
-    if runStartDistance ~= -1 and runStartDistance <= currentDistance then
-        shouldWalk = false
-    end
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local shouldWalk = not (runStartDistance ~= -1 and runStartDistance <= currentDistance)
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     if approachDistance <= currentDistance then
         goal:AddSubGoal(GOAL_COMMON_ApproachTarget, 5, TARGET_ENE_0, approachDistance, TARGET_SELF, shouldWalk, guardStateId)
     else
@@ -767,11 +703,8 @@ function Backstab_Act(ai, goal, observeAreaId, stopDistance, timerId, timerDurat
 end
 
 function Torimaki_Act(ai, goal, guardChance)
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     if currentDistance >= 15 then
         goal:AddSubGoal(GOAL_COMMON_ApproachTarget, 5, TARGET_ENE_0, 4.5, TARGET_SELF, true, -1)
@@ -786,11 +719,8 @@ function Torimaki_Act(ai, goal, guardChance)
 end
 
 function Kankyaku_Act(ai, goal, guardChance)
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     local currentDistance = ai:GetDist(TARGET_ENE_0)
     if currentDistance >= 15 then
         goal:AddSubGoal(GOAL_COMMON_ApproachTarget, 5, TARGET_ENE_0, 6.5, TARGET_SELF, true, -1)
@@ -817,13 +747,13 @@ function SelectOddsIndex(ai, probabilities)
     for i = 1, tableSize do
         totalWeight = totalWeight + probabilities[i]
     end
-    local randomRoll = ai:GetRandam_Int(0, totalWeight - 1)
+    local random = ai:GetRandam_Int(0, totalWeight - 1)
     for j = 1, tableSize do
         local currentWeight = probabilities[j]
-        if randomRoll < currentWeight then
+        if random < currentWeight then
             return j
         end
-        randomRoll = randomRoll - currentWeight
+        random = random - currentWeight
     end
     return -1
 end
@@ -982,26 +912,17 @@ function Approach_Act_Flex(ai, goal, stopDistance, runChanceDistance, forceRunDi
     walkLife = walkLife or 3
     runLife = runLife or 8
     local currentDistance = ai:GetDist(TARGET_ENE_0)
-    local randomRoll = ai:GetRandam_Int(1, 100)
-    local shouldWalk = true
-    if forceRunDistance <= currentDistance then
-        shouldWalk = false
-    elseif runChanceDistance <= currentDistance and randomRoll <= runChance then
-        shouldWalk = false
-    end
-    local guardStateId = -1
-    local guardRoll = ai:GetRandam_Int(1, 100)
-    if guardRoll <= guardChance then
-        guardStateId = 9910
-    end
+    local random = ai:GetRandam_Int(1, 100)
+    local shouldWalk = not (currentDistance >= forceRunDistance or
+        (currentDistance >= runChanceDistance and random <= runChance))
+    local guardRoll = ai:GetRandam_Int(1, 100) 
+    local guardStateId = guardRoll <= guardChance and 9910 or -1
     local approachLife = shouldWalk and walkLife or runLife
     local distanceAdjustment = 0
     if stopDistance <= currentDistance then
-        if shouldWalk then
-            stopDistance = stopDistance + ai:GetStringIndexedNumber("AddDistWalk") + distanceAdjustment
-        else
-            stopDistance = stopDistance + ai:GetStringIndexedNumber("AddDistRun") + distanceAdjustment
-        end
+        local approachLife = shouldWalk and walkLife or runLife
+        local distApproach = shouldWalk and "AddDistWalk" or "AddDistRun"
+        stopDistance = stopDistance + ai:GetStringIndexedNumber(distApproach)
         goal:AddSubGoal(GOAL_COMMON_ApproachTarget, approachLife, TARGET_ENE_0, stopDistance, TARGET_SELF, shouldWalk, guardStateId)
     end
 end
@@ -1009,11 +930,7 @@ end
 function SpaceCheck(ai, radius, direction, distance)
     local hitRadius = ai:GetMapHitRadius(TARGET_SELF)
     local hitDistance = ai:GetExistMeshOnLineDistSpecifyAngleEx(TARGET_SELF, direction, distance + hitRadius, AI_SPA_DIR_TYPE_TargetF, hitRadius, 0)
-    if distance * 0.95 <= hitDistance then
-        return true
-    else
-        return false
-    end
+    return distance * 0.95 <= hitDistance
 end
 
 function InsideRange(ai, goal, angleStart, angleWidth, minDist, maxDist)
@@ -1031,17 +948,9 @@ function YSD_InsideRangeEx(ai, goal, angleStart, angleWidth, minDist, maxDist)
     if minDist <= distance and distance <= maxDist then
         local angleToTarget = ai:GetToTargetAngle(TARGET_ENE_0)
         local angleSign = 0
-        if angleStart < 0 then
-            angleSign = -1
-        else
-            angleSign = 1
-        end
-        if (angleStart + angleWidth / -2 <= angleToTarget and angleToTarget <= angleStart + angleWidth / 2) or
-           (angleStart + angleWidth / -2 <= angleToTarget + 360 * angleSign and angleToTarget + 360 * angleSign <= angleStart + angleWidth / 2) then
-            return true
-        else
-            return false
-        end
+        angleSign = angleStart < 0 and -1 or 1
+        return (angleStart + angleWidth / -2 <= angleToTarget and angleToTarget <= angleStart + angleWidth / 2) or
+           (angleStart + angleWidth / -2 <= angleToTarget + 360 * angleSign and angleToTarget + 360 * angleSign <= angleStart + angleWidth / 2)
     else
         return false
     end
@@ -1060,9 +969,8 @@ function SetCoolTime(actor, goals, animationIds, coolDowns, weight, weightReplan
 end
 
 function Counter_Act(ai, goal, baseIncrement, counterAnimation)
-    local life = 0.5
     baseIncrement = baseIncrement or 4
-    local randomRoll = ai:GetRandam_Int(1, 100)
+    local random = ai:GetRandam_Int(1, 100)
     local currentIncrement = ai:GetNumber(15)
     if ai:IsInterupt(INTERUPT_Damaged) then
         ai:SetTimer(15, 5)
@@ -1074,11 +982,11 @@ function Counter_Act(ai, goal, baseIncrement, counterAnimation)
     if currentIncrement >= 100 then
         ai:SetNumber(15, 100)
     end
-    if ai:IsInterupt(INTERUPT_Damaged) and randomRoll <= ai:GetNumber(15) and ai:GetTimer(14) <= 0 then
+    if ai:IsInterupt(INTERUPT_Damaged) and random <= ai:GetNumber(15) and ai:GetTimer(14) <= 0 then
         ai:SetTimer(14, 3)
         ai:SetNumber(15, 0)
         goal:ClearSubGoal()
-        goal:AddSubGoal(GOAL_COMMON_EndureAttack, life, counterAnimation, TARGET_ENE_0, DIST_None, 0, 180, 0, 0)
+        goal:AddSubGoal(GOAL_COMMON_EndureAttack, 0.5, counterAnimation, TARGET_ENE_0, DIST_None, 0, 180, 0, 0)
         return true
     end
     return false
@@ -1087,7 +995,6 @@ end
 function ReactBackstab_Act(ai, goal, reactionType, counterAnimation, counterChance)
     local reactionRoll = ai:GetRandam_Int(1, 100)
     local directionRoll = ai:GetRandam_Int(1, 100)
-    local life = 3
     local backStepAnim = 6000
     local leftStepAnim = 6002
     local rightStepAnim = 6003
@@ -1097,25 +1004,25 @@ function ReactBackstab_Act(ai, goal, reactionType, counterAnimation, counterChan
     if ai:IsInterupt(INTERUPT_BackstabRisk) then
         if reactionRoll <= counterChance then
             goal:ClearSubGoal()
-            goal:AddSubGoal(GOAL_COMMON_StabCounterAttack, life, counterAnimation, TARGET_ENE_0, DIST_None, 0, 180, 0, 0)
+            goal:AddSubGoal(GOAL_COMMON_StabCounterAttack, 3, counterAnimation, TARGET_ENE_0, DIST_None, 0, 180, 0, 0)
         elseif reactionType == 1 then
             goal:ClearSubGoal()
-            goal:AddSubGoal(GOAL_COMMON_SpinStep, life, backStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_F, 0)
+            goal:AddSubGoal(GOAL_COMMON_SpinStep, 3, backStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_F, 0)
         elseif reactionType == 2 then
             goal:ClearSubGoal()
             if directionRoll <= 50 then
-                goal:AddSubGoal(GOAL_COMMON_SpinStep, life, leftStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_L, 0)
+                goal:AddSubGoal(GOAL_COMMON_SpinStep, 3, leftStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_L, 0)
             else
-                goal:AddSubGoal(GOAL_COMMON_SpinStep, life, rightStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_R, 0)
+                goal:AddSubGoal(GOAL_COMMON_SpinStep, 3, rightStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_R, 0)
             end
         elseif reactionType == 3 then
             goal:ClearSubGoal()
             if directionRoll <= 33 then
-                goal:AddSubGoal(GOAL_COMMON_SpinStep, life, backStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_F, 0)
+                goal:AddSubGoal(GOAL_COMMON_SpinStep, 3, backStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_F, 0)
             elseif directionRoll <= 66 then
-                goal:AddSubGoal(GOAL_COMMON_SpinStep, life, leftStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_L, 0)
+                goal:AddSubGoal(GOAL_COMMON_SpinStep, 3, leftStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_L, 0)
             else
-                goal:AddSubGoal(GOAL_COMMON_SpinStep, life, rightStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_R, 0)
+                goal:AddSubGoal(GOAL_COMMON_SpinStep, 3, rightStepAnim, TARGET_SELF, 0, AI_DIR_TYPE_R, 0)
             end
         end
         return false
