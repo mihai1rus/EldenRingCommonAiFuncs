@@ -1360,7 +1360,18 @@ function ControlledWarp(ai, goal, options, target)
 end
 
 -- Executes an AI script on certain actions. Essentially for Hot-Reloading AI.
-function ScriptReload(ai, goal, condition, filePath)
+function ScriptReload(ai, goal, conditionType, filePath)
+    local spEffects = {
+        Jump = 140,
+        Roll = 430,
+        Crouch = 150
+    }
+    local condition = false
+    if conditionType == "Jump" or conditionType == "Roll" or conditionType == "Crouch" then
+        condition = ai:HasSpecialEffectId(TARGET_ENE_0, spEffects[conditionType])
+    else
+        condition = conditionType
+    end
     if condition then
         local script = loadfile(filePath)
         if script then
