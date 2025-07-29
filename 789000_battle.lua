@@ -462,7 +462,7 @@ end
 
 Goal.Interrupt = function (self, ai, goal)
     local test = ai:HasSpecialEffectId(TARGET_ENE_0, 140)
-    ScriptReload(ai, goal, test, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\ELDEN RING\\Game\\TheGardenOfEyesDLC\\script\\789000_battle-luabnd-dcx\\789000_battle.lua")
+    ScriptReload(ai, goal, test, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\ELDEN RING\\Game\\TestMod\\script\\789000_battle-luabnd-dcx\\789000_battle.lua")
     local distance = ai:GetDist(TARGET_ENE_0)
     local successDistance = 5 - ai:GetMapHitRadius(TARGET_SELF)
     local turnTime = 0
