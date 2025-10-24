@@ -20,7 +20,7 @@ function Common_Battle_Activate(ai, goal, probabilities, acts, actAfter)
         else
             actionFuncs[i] = REGIST_FUNC(ai, goal, errorAct)
         end
-        actionWeights[i] = probabilities[i] or 0
+        actionWeights[i] = probabilities[i]
         totalWeight = totalWeight + actionWeights[i]
     end
 
