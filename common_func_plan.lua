@@ -1379,3 +1379,24 @@ function ScriptReload(ai, goal, conditionType, filePath)
         end
     end
 end
+
+-- Processes Acts as provided from a table
+function ActGen(prefix, actTable, startCnt, endCnt)
+    for actNum = startCnt, endCnt do
+        local config = actTable[actNum]
+        if config then
+            local name = prefix .. actNum
+            if config.type == "ApproachAndAttack" then
+                _G[name] = function(ai, goal, paramTbl)
+                    return SetupApproach(ai, goal, config.params)
+                end
+            elseif config.type == "OnlyAttack" then
+                _G[name] = function(ai, goal, paramTbl)
+                    return SetupAttack(ai, goal, config.params)
+                end
+            elseif config.type == "Special" and config.func then
+                _G[name] = config.func
+            end
+        end
+    end
+end
