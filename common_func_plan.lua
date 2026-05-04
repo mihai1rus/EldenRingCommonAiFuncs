@@ -1400,3 +1400,52 @@ function ActGen(prefix, actTable, startCnt, endCnt)
         end
     end
 end
+
+-- To Write Follow-ups Faster
+function SpEffectCR(self, ai, goal, params, isNotClearSubGoal)
+    local targetSpEffect = params.targetArg or TARGET_SELF
+    local targetAtk = params.targetAtkArg or TARGET_ENE_0
+    if isNotClearSubGoal == false or nil then
+        goal:ClearSubGoal()
+    end
+    if params.spEffect ~= nil then
+        ai:AddObserveSpecialEffectAttribute(targetSpEffect, params.spEffect)
+    end
+    goal:AddSubGoal(GOAL_COMMON_ComboRepeat_SuccessAngle180, params.life or 10, params.anim, targetAtk, 999, 0, 0)
+    return true
+end
+
+-- Sets Number to 1 if the Player has Performed an Action Recently (Also Keeps Track of how Many Times the Player has Performed said Action)
+function ActionSensitivity(ai, actionCnt, isAction, spEffect)
+    if ai:HasSpecialEffectId(TARGET_ENE_0, spEffect) then
+        if ai:GetNumber(isAction) == 0 then
+            ai:SetNumber(actionCnt, ai:GetNumber(actionCnt) + 1)
+        end
+        ai:SetNumber(isAction, 1)
+        ai:SetTimer(isAction, 1)
+    end
+    if ai:GetTimer(isAction) <= 0 and ai:GetNumber(isAction) == 1 then
+        ai:SetNumber(isAction, 0)
+        return true
+    end
+    return false
+end
+
+-- Ticks Up with a Delay as the Player is Guarding with a Grace Period
+function GuardSensitivity(ai, gracePeriod, tickCounter, gracePeriodCnt, tickDelayCnt, guardCnt)
+    if ai:IsTargetGuard(TARGET_ENE_0) then
+        ai:SetNumber(gracePeriodCnt, 0)
+        ai:SetNumber(tickDelayCnt, ai:GetNumber(tickDelayCnt) + 1)
+        if ai:GetNumber(tickDelayCnt) >= tickCounter then
+            ai:SetNumber(guardCnt, ai:GetNumber(guardCnt) + 1)
+            ai:SetNumber(tickDelayCnt, 0)
+        end
+    else
+        ai:SetNumber(gracePeriodCnt, ai:GetNumber(gracePeriodCnt) + 1)
+        if ai:GetNumber(gracePeriodCnt) >= gracePeriod then
+            ai:SetNumber(guardCnt, 0)
+            ai:SetNumber(tickDelayCnt, 0)
+            ai:SetNumber(gracePeriodCnt, 0)
+        end
+    end
+end
