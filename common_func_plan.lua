@@ -957,11 +957,11 @@ function YSD_InsideRangeEx(ai, goal, angleStart, angleWidth, minDist, maxDist)
     
 end
 
-function SetCoolTime(actor, goals, animationIds, coolDowns, weight, weightReplan)
-    coolDowns = actor:RegistAttackTimeInterval(animationIds, coolDowns)
+function SetCoolTime(ai, goal, animationIds, coolDowns, weight, weightReplan)
+    coolDowns = ai:RegistAttackTimeInterval(animationIds, coolDowns)
     if weight <= 0 then
         return 0
-    elseif actor:GetAttackPassedTime(animationIds) <= coolDowns then
+    elseif ai:GetAttackPassedTime(animationIds) <= coolDowns then
         return weightReplan
     end
     return weight
@@ -1265,7 +1265,7 @@ function SetupAttack(ai, goal, params)
 end
 
 -- Allows the user to set a cooldown for an act relative to multiple animations at once. 
-function SetCoolTimeMultiple(actor, goals, animationIds, cooldowns, weight, weightReplan)
+function SetCoolTimeMultiple(ai, goal, animationIds, cooldowns, weight, weightReplan)
     local animIds = type(animationIds) == "table" and animationIds or {animationIds}
     local cdList = type(cooldowns) == "table" and cooldowns or {cooldowns}    
     if weight <= 0 then
@@ -1273,8 +1273,8 @@ function SetCoolTimeMultiple(actor, goals, animationIds, cooldowns, weight, weig
     end
     for i, animId in ipairs(animIds) do
         local cooldown = cdList[i] or cdList[1]
-        actor:RegistAttackTimeInterval(animId, cooldown)        
-        if actor:GetAttackPassedTime(animId) <= cooldown then
+        ai:RegistAttackTimeInterval(animId, cooldown)        
+        if ai:GetAttackPassedTime(animId) <= cooldown then
             return weightReplan
         end
     end   
@@ -1402,7 +1402,7 @@ function ActGen(prefix, actTable, startCnt, endCnt)
 end
 
 -- To Write Follow-ups Faster
-function SpEffectCR(self, ai, goal, params, isNotClearSubGoal)
+function SpEffectCR(ai, goal, params, isNotClearSubGoal)
     local targetSpEffect = params.targetArg or TARGET_SELF
     local targetAtk = params.targetAtkArg or TARGET_ENE_0
     if isNotClearSubGoal == false or nil then
