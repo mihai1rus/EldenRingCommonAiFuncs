@@ -1,6 +1,9 @@
 function COMMON_SoundBehavior_FlagInitialize(ai)
-    if not ai:IsSearchLowState() and not ai:IsSearchHighState()
-    and not ai:IsCautionState() and not ai:IsBattleState() then
+    if not ai:IsSearchLowState() 
+            and not ai:IsSearchHighState()
+            and not ai:IsCautionState() 
+            and not ai:IsBattleState() then
+        
         ai:SetStringIndexedNumber("COMMON_SoundBehavior_Arrived", 0)
         ai:SetStringIndexedNumber("COMMON_SoundBehavior_DoneFirstAct", 0)
     end
