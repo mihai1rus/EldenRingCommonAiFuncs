@@ -1,9 +1,5 @@
---****************************************************************************************************************************************************************************************************************************************--
--- I've increased the maximum number of acts from 50 to 500 (only for enemies, CommonNPC was always at 500 so don't change that) and replaced an i = 50 with a break in Common_Battle_Activate but everything else here should be the same. 
---****************************************************************************************************************************************************************************************************************************************--
-
 function Common_Clear_Param(probabilities, acts)
-    for actNum = 1, 500 do
+    for actNum = 1, 50 do
         probabilities[actNum] = 0
         acts[actNum] = nil
     end
@@ -13,7 +9,7 @@ function Common_Battle_Activate(ai, goal, probabilities, acts, actAfter)
     local actionFuncs = {}
     local actionWeights = {}
     local totalWeight = 0
-    local actMax = 500
+    local actMax = 50
     for i = 1, actMax do
         if acts[i] then
             actionFuncs[i] = acts[i]
