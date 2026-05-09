@@ -781,12 +781,5 @@ function COMMON_SoundBehavior(ai, soundBehaviour)
         end
     end
 
-    if soundBehaviour == 7001 
-            and ai:IsBattleState() then
-
-        ai:AddTopGoal(GOAL_COMMON_LeaveTarget_Continuous, 2, TARGET_SOUND, ai:GetRandam_Float(3, 5), TARGET_SELF, false, -1, GUARD_GOAL_DESIRE_RET_Continue, false, 2)
-        return true
-    end
-
     return false
 end
